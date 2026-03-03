@@ -57,6 +57,13 @@ pub fn build() -> Result<EspIdfBuildOutput> {
                 env::var(CARGO_CMAKE_BUILD_INCLUDES_VAR)?
                     .split(';')
                     .map(|dir| format!("-I{dir}"))
+                    .chain(
+                        env::var("BINDGEN_EXTRA_CLANG_ARGS")
+                            .unwrap_or_default()
+                            .split(' ')
+                            .filter(|s| !s.is_empty())
+                            .map(str::to_string),
+                    )
                     .collect::<Vec<_>>(),
             ),
         env_path: None,

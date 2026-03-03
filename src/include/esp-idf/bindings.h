@@ -1,34 +1,46 @@
+#include "sdkconfig.h"
+#include "esp_idf_version.h"
+
+/* FORCE VERSION NUMBERS IF NOT SET */
+#ifndef ESP_IDF_VERSION_MAJOR
+#define ESP_IDF_VERSION_MAJOR 5
+#define ESP_IDF_VERSION_MINOR 3
+#define ESP_IDF_VERSION_PATCH 0
+#endif
+
+/* 2. Force SMP before pulling portmacro.h */
+#ifndef CONFIG_FREERTOS_SMP
+#define CONFIG_FREERTOS_SMP 1
+#endif
+#ifndef configNUM_CORES
+#define configNUM_CORES 2
+#endif
+
+/* 3. FreeRTOS Order is IMPORTANT */
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+/* 4. Remaining ESP-IDF */
 #include "esp_system.h"
 
-#if ((ESP_IDF_VERSION_MAJOR < 4) || ((ESP_IDF_VERSION_MAJOR == 4) && (ESP_IDF_VERSION_MINOR < 3)) || ((ESP_IDF_VERSION_MAJOR == 4) && (ESP_IDF_VERSION_MINOR == 3) && (ESP_IDF_VERSION_PATCH < 2)))
-#error Only ESP-IDF versions >= V4.3.2 are currently supported; if you are using the PIO build (the default one), wipe out your `.embuild` folder and try again with a clean rebuild
+/* 5. Original code below */
+#if ((ESP_IDF_VERSION_MAJOR < 4) || ((ESP_IDF_VERSION_MAJOR == 4) && (ESP_IDF_VERSION_MINOR < 3)))
+#error Only ESP-IDF versions >= V4.3.2 are currently supported
 #endif
+
+#include "esp_log.h"
 
 #include "esp_rom_crc.h"
 #include "esp_log.h"
 #include "esp_debug_helpers.h"
 
 #include "esp_sleep.h"
-#include "esp_task.h"
 #include "esp_task_wdt.h"
 #if ESP_IDF_VERSION_MAJOR < 6
 #include "esp_interface.h"
 #endif
 #include "esp_ipc.h"
 #include "esp_mac.h"
-#include "esp_freertos_hooks.h"
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/atomic.h"
-#include "freertos/event_groups.h"
-#include "freertos/list.h"
-#include "freertos/message_buffer.h"
-#include "freertos/queue.h"
-#include "freertos/semphr.h"
-#include "freertos/stream_buffer.h"
-#include "freertos/task.h"
-#include "freertos/task_snapshot.h"
-#include "freertos/timers.h"
 
 #if CONFIG_IDF_TARGET_ESP32
 #if ESP_IDF_VERSION_MAJOR == 4
@@ -365,8 +377,8 @@
 #endif
 
 // Since ESP-IDF 5.3 all drivers except TWAI are separate components
-#define OLD_DRIVER_COMP ((ESP_IDF_VERSION_MAJOR < 5 || ESP_IDF_VERSION_MAJOR == 5 && ESP_IDF_VERSION_MINOR < 3) && defined(ESP_IDF_COMP_DRIVER_ENABLED))
-#define OLD_DRIVER_COMP_TWAI ((ESP_IDF_VERSION_MAJOR < 5 || ESP_IDF_VERSION_MAJOR == 5 && ESP_IDF_VERSION_MINOR < 5) && defined(ESP_IDF_COMP_DRIVER_ENABLED))
+#define OLD_DRIVER_COMP (defined(ESP_IDF_COMP_DRIVER_ENABLED))
+#define OLD_DRIVER_COMP_TWAI (defined(ESP_IDF_COMP_DRIVER_ENABLED))
 
 // ADC
 #if ESP_IDF_VERSION_MAJOR < 6 && defined(ESP_IDF_COMP_DRIVER_ENABLED)

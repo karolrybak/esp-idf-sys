@@ -19,7 +19,7 @@ rust-version = "1.82"
 harness = false
 
 [features]
-default = ["std", "binstart"]
+default = ["std"]
 
 std = []
 alloc_handler = []

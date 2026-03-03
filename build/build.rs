@@ -57,7 +57,7 @@ fn main() -> anyhow::Result<()> {
     // selected string ones, as per below
     //
     // This might change in future
-    let kconfig_str_allow = regex::Regex::new(r"IDF_TARGET")?;
+    let kconfig_str_allow = regex::Regex::new(r"IDF_TARGET|HTTPD_WS_SUPPORT")?;
 
     let cfg_args = build::CfgArgs {
         args: build_output
@@ -111,6 +111,11 @@ fn main() -> anyhow::Result<()> {
             .blocklist_function("_v.*printf_r")
             .blocklist_function("_v.*scanf_r")
             .blocklist_function("esp_log_writev")
+            // Work around E0588: packed type with transitively aligned field from TinyUSB descriptors
+            .blocklist_type("cdc_desc_func_telephone_call_state_reporting_capabilities_t")
+            .blocklist_type(
+                "cdc_desc_func_telephone_call_state_reporting_capabilities_t__bindgen_ty_1",
+            )
             .blocklist_type("pcnt_unit_t") // Fix for struct pcnt_unit_t vs enum pcnt_unit_t
             .clang_args(build_output.components.clang_args())
             .clang_args(vec![
