@@ -5,7 +5,7 @@
 #ifndef ESP_IDF_VERSION_MAJOR
 #define ESP_IDF_VERSION_MAJOR 5
 #define ESP_IDF_VERSION_MINOR 3
-#define ESP_IDF_VERSION_PATCH 0
+#define ESP_IDF_VERSION_PATCH 4
 #endif
 
 /* 2. Force SMP before pulling portmacro.h */
@@ -88,9 +88,9 @@
 #if ESP_IDF_VERSION_MAJOR > 4
 #ifdef ESP_IDF_COMP_SPI_FLASH_ENABLED
 #include "esp_flash.h"
-#if ESP_IDF_VERSION_MAJOR > 5
+#if __has_include("spi_flash_mmap.h")
 #include "spi_flash_mmap.h"
-#else
+#elif __has_include("esp_spi_flash.h")
 #include "esp_spi_flash.h"
 #endif
 #endif
@@ -138,9 +138,9 @@
 #endif
 #include "esp_now.h"
 #include "esp_mesh.h"
-#if ESP_IDF_VERSION_MAJOR > 5
+#if __has_include("esp_eap_client.h")
 #include "esp_eap_client.h"
-#else
+#elif __has_include("esp_wpa2.h")
 #include "esp_wpa2.h"
 #endif
 #if (ESP_IDF_VERSION_MAJOR < 5 || ESP_IDF_VERSION_MAJOR == 5 && ESP_IDF_VERSION_MINOR < 1)
@@ -173,18 +173,15 @@
 #include "esp_rrm.h"
 #include "esp_wnm.h"
 #include "esp_wpa.h"
-#if ESP_IDF_VERSION_MAJOR > 5
+#if __has_include("esp_eap_client.h")
 #include "esp_eap_client.h"
-#else
+#elif __has_include("esp_wpa2.h")
 #include "esp_wpa2.h"
 #endif
 #include "esp_wps.h"
 #if ESP_IDF_VERSION_MAJOR > 5 || ESP_IDF_VERSION_MAJOR == 5 && ESP_IDF_VERSION_MINOR >= 1
 #include "esp_supplicant_utils.h"
 #endif
-// #if ESP_IDF_VERSION_MAJOR > 5 || ESP_IDF_VERSION_MAJOR == 5 && ESP_IDF_VERSION_MINOR >= 2
-// #include "esp_eap_client.h"
-// #endif
 #endif
 
 #ifdef ESP_IDF_COMP_ESP_ETH_ENABLED
@@ -230,9 +227,9 @@
 #include "esp_vfs_dev.h"
 #include "esp_vfs_semihost.h"
 #ifdef SOC_USB_SERIAL_JTAG_SUPPORTED
-#if ESP_IDF_VERSION_MAJOR > 5
+#if __has_include("driver/usb_serial_jtag_vfs.h")
 #include "driver/usb_serial_jtag_vfs.h"
-#else
+#elif __has_include("esp_vfs_usb_serial_jtag.h")
 #include "esp_vfs_usb_serial_jtag.h"
 #endif
 #endif
@@ -380,13 +377,13 @@
 #define OLD_DRIVER_COMP (defined(ESP_IDF_COMP_DRIVER_ENABLED))
 #define OLD_DRIVER_COMP_TWAI (defined(ESP_IDF_COMP_DRIVER_ENABLED))
 
+
 // ADC
-#if ESP_IDF_VERSION_MAJOR < 6 && defined(ESP_IDF_COMP_DRIVER_ENABLED)
-#include "driver/adc.h"
-#endif
-#if ESP_IDF_VERSION_MAJOR > 4 && (defined(ESP_IDF_COMP_ESP_ADC_CAL_ENABLED) || defined(ESP_IDF_COMP_ESP_ADC_ENABLED))
+#if __has_include("esp_adc/adc_oneshot.h")
 #include "esp_adc/adc_oneshot.h"
 #include "esp_adc/adc_continuous.h"
+#elif __has_include("driver/adc.h")
+#include "driver/adc.h"
 #endif
 
 // TWAI
@@ -514,7 +511,7 @@
 #include "driver/sdmmc_types.h"
 #include "driver/sdspi_host.h"
 #endif
-#if ESP_IDF_VERSION_MAJOR > 5
+#if ESP_IDF_VERSION_MAJOR >= 5
 #if defined(ESP_IDF_COMP_SDMMC_ENABLED)
 #include "sdmmc_cmd.h"
 #endif
