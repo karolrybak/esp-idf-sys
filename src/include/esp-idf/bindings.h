@@ -310,6 +310,7 @@
 #ifdef ESP_IDF_COMP_BOOTLOADER_SUPPORT_ENABLED
 #include "bootloader_common.h"
 #include "bootloader_random.h"
+#include "esp_app_format.h"
 #endif
 
 #ifdef ESP_IDF_COMP_APP_UPDATE_ENABLED
